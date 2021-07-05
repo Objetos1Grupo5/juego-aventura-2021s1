@@ -3,25 +3,64 @@ import fondo.*
 import personajes.*
 import elementos.*
 import nivel_llaves.*
+import utilidades.*
 
 
 object nivelBloques {
-
+	const property personaje= new PersonajeNivelBloques()
+	const property bloquesEnTablero = #{}
+	
+	method todosLosBloquesEnDeposito() = self.bloquesEnTablero().all( { b => b.estaEnDeposito() } )
+	
+	method faltanRequisitos() {
+		if (self.todosLosBloquesEnDeposito())
+			game.say(personaje,"Debo ir a la salida")
+		else
+			game.say(personaje,"Faltan bloques en el deposito")
+	}
+	
+	method hayBloque(posicion) = self.bloquesEnTablero().any( { b => b.position() == posicion } )
+	method ponerBloques(cantidad) { 	// debe recibir cantidad y EL NOMBRE DE UN ELEMENTO
+		if(cantidad > 0) {
+			const unaPosicion = utilidadesParaJuego.posicionArbitraria()
+			if (not self.hayBloque(unaPosicion) ) {	//si la posicion no eta ocupada
+				const unBloque = new Bloque(position=unaPosicion) // instancia el bloque en una posicion
+				bloquesEnTablero.add(unBloque)	//Agrega el bloque a la lista
+				game.addVisual(unBloque) //Agrega el bloque al tablero
+				self.ponerBloques(cantidad -1) //llamada recursiva al proximo bloque a agregar
+			}else{
+				self.ponerBloques(cantidad)	
+			}
+		}
+	}
+	
 	method configurate() {
 		// fondo - es importante que sea el primer visual que se agregue
-		game.addVisual(new Fondo(image="fondoCompleto.png"))
-				 
+		game.addVisual(new Fondo())
+		
+		// Se agrega la salida al tablero
+		game.addVisual(salida)
+						
 		// otros visuals, p.ej. bloques o llaves
-		game.addVisual(new Bloque(position=game.at(3,12)))
-			
+		self.ponerBloques(5)
+
 		// personaje, es importante que sea el último visual que se agregue
-		game.addVisual(personajeSimple)
+		game.addVisual(personaje)
 		
 		// teclado
-		// este es para probar, no es necesario dejarlo
-		keyboard.t().onPressDo({ self.terminar() })
-
-		// en este no hacen falta colisiones
+		
+		/*Movimientos del personaje*/
+		keyboard.right().onPressDo{ personaje.moverDerecha() }
+		keyboard.left().onPressDo{ personaje.moverIzquierda() } 
+		keyboard.up().onPressDo{ personaje.moverArriba() }
+		keyboard.down().onPressDo{ personaje.moverAbajo() }
+		keyboard.n().onPressDo({ // al presionar "n" finaliza el juego o da indicaciones
+			if(self.todosLosBloquesEnDeposito() and personaje.position() == salida.position() )
+				self.terminar()
+			else
+				self.faltanRequisitos()
+		})
+					
 	}
 	
 	method terminar() {
@@ -29,14 +68,14 @@ object nivelBloques {
 		game.clear()
 		// después puedo volver a agregar el fondo, y algún visual para que no quede tan pelado
 		game.addVisual(new Fondo(image="fondoCompleto.png"))
-		game.addVisual(personajeSimple)
+		game.addVisual(personaje)
 		// después de un ratito ...
-		game.schedule(2500, {
+		game.schedule(1000, {
 			game.clear()
 			// cambio de fondo
 			game.addVisual(new Fondo(image="finNivel1.png"))
 			// después de un ratito ...
-			game.schedule(3000, {
+			game.schedule(1500, {
 				// ... limpio todo de nuevo
 				game.clear()
 				// y arranco el siguiente nivel
@@ -46,4 +85,3 @@ object nivelBloques {
 	}
 		
 }
-
