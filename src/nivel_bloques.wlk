@@ -64,6 +64,8 @@ object nivelBloques {
 	}
 	
 	method terminar() {
+		//sonido pasar
+		game.sound("pasar.mp3").play()		
 		// game.clear() limpia visuals, teclado, colisiones y acciones
 		game.clear()
 		// después puedo volver a agregar el fondo, y algún visual para que no quede tan pelado
