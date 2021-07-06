@@ -24,11 +24,14 @@ object deposito { // esta determinado por la zona de baldozas color naranja
 object salida { // la salida se visualiza siempre en el mismo lugar del tablero
 	const property position = game.at(game.width()-1,0)
 	const property image = "salida.png"
+	const property sonido = "salir.mp3"
+		
 	method reaccionarA(unPersonaje){ } // no hace nada para respetar el polimorfismo
 }
 
 class Elemento{
 	var property position = game.at(0,0)
+	const property sonido = "coin.mp3"
 	
 	method dejarPasar(unPersonaje) { unPersonaje.position(self.position()) }
 	method esCeldaSorpresa(){return false}
@@ -39,6 +42,7 @@ class Elemento{
 }
 class Llave inherits Elemento{
 	const property image = "llave.png"
+	override method sonido() = "salir.mp3"
 	override method reaccionarA(unPersonaje){
 		super(unPersonaje)
 		unPersonaje.guardarLlave()
@@ -48,6 +52,8 @@ class Llave inherits Elemento{
 class Pollo inherits Elemento{
 	var property energia =  0.randomUpTo(30).truncate(0)
 	const property image = "pollo.png"
+	
+	override method sonido() = "comer.mp3"
 	override method reaccionarA(unPersonaje){
 		super(unPersonaje)
 		unPersonaje.comerPollo(self)

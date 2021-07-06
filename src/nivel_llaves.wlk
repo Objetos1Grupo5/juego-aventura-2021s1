@@ -33,9 +33,8 @@ object nivelLlaves {
 	}
 	
 	method entroEnZona(posicionPersonaje,posicionCelda) {
-		return (posicionCelda.x().between(posicionPersonaje.x() -1 ,posicionPersonaje.x() +1)
-					 and
-			  	posicionCelda.y().between(posicionPersonaje.y() -1 ,posicionPersonaje.y() +1))
+		return (posicionCelda.x().between(posicionPersonaje.x() ,posicionPersonaje.x() ) and    posicionCelda.y().between(posicionPersonaje.y() -1 ,posicionPersonaje.y() +1)
+		or     posicionCelda.x().between(posicionPersonaje.x() -1 ,posicionPersonaje.x() +1) and    posicionCelda.y().between(posicionPersonaje.y()  ,posicionPersonaje.y() ))
 	}
 	
 	method configurate() {
@@ -70,6 +69,7 @@ object nivelLlaves {
 		game.whenCollideDo(personaje, { 
 			objeto => game.removeVisual(objeto)
 			elementosEnNivel.remove(objeto)
+			game.sound(objeto.sonido()).play()
 			self.estado()
 		} )
 	}
